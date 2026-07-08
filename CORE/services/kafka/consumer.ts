@@ -1,6 +1,7 @@
 import { Kafka, type Consumer, type EachMessagePayload } from 'kafkajs';
 import { z } from 'zod';
 import { buildKafkaClientConfig } from './buildClientConfig.js';
+import { ensureCommerceKafkaTopics } from './ensureTopics.js';
 import { config } from '../../config/index.js';
 import { logger } from '../logger/index.js';
 import { COMMERCE_KAFKA_TOPICS } from '../../constants/kafka/index.js';
@@ -44,35 +45,50 @@ export const startCommerceKafkaConsumer = async (): Promise<void> => {
     return;
   }
 
-  const kafka = new Kafka(buildKafkaClientConfig({
-    clientId: `${config.kafka.clientId}-commerce-consumer`,
-    brokers: config.kafka.brokers,
-    saslUsername: config.kafka.saslUsername,
-    saslPassword: config.kafka.saslPassword,
-    ssl: config.kafka.ssl,
-  }));
+  try {
+    await ensureCommerceKafkaTopics([
+      COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER_READY,
+      COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER,
+      COMMERCE_KAFKA_TOPICS.NOTIFICATION_DISPATCH,
+      COMMERCE_KAFKA_TOPICS.LIVESTREAM_EVENT,
+    ]);
 
-  consumer = kafka.consumer({ groupId: `${config.kafka.clientId}-commerce` });
-  await consumer.connect();
-  await consumer.subscribe({
-    topic: COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER_READY,
-    fromBeginning: false,
-  });
+    const kafka = new Kafka(buildKafkaClientConfig({
+      clientId: `${config.kafka.clientId}-commerce-consumer`,
+      brokers: config.kafka.brokers,
+      saslUsername: config.kafka.saslUsername,
+      saslPassword: config.kafka.saslPassword,
+      ssl: config.kafka.ssl,
+    }));
 
-  await consumer.run({
-    eachMessage: async (payload) => {
-      try {
-        await handleReadyMessage(payload);
-      } catch (error) {
-        logger.error({ error }, '[CommerceKafka] Auction order ready handler failed');
-      }
-    },
-  });
+    consumer = kafka.consumer({ groupId: `${config.kafka.clientId}-commerce` });
+    await consumer.connect();
+    await consumer.subscribe({
+      topic: COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER_READY,
+      fromBeginning: false,
+    });
 
-  logger.info(
-    { topic: COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER_READY },
-    '[CommerceKafka] Consumer started',
-  );
+    await consumer.run({
+      eachMessage: async (payload) => {
+        try {
+          await handleReadyMessage(payload);
+        } catch (error) {
+          logger.error({ error }, '[CommerceKafka] Auction order ready handler failed');
+        }
+      },
+    });
+
+    logger.info(
+      { topic: COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER_READY },
+      '[CommerceKafka] Consumer started',
+    );
+  } catch (error) {
+    consumer = null;
+    logger.warn(
+      { error, topic: COMMERCE_KAFKA_TOPICS.FINANCE_ORDER_AUCTION_WINNER_READY },
+      '[CommerceKafka] Consumer unavailable — continuing without Kafka consumer',
+    );
+  }
 };
 
 export const stopCommerceKafkaConsumer = async (): Promise<void> => {
