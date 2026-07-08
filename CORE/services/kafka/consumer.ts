@@ -1,6 +1,6 @@
 import { Kafka, type Consumer, type EachMessagePayload } from 'kafkajs';
 import { z } from 'zod';
-import { buildKafkaClientConfig } from '../../../../KAFKA/buildClientConfig.js';
+import { buildKafkaClientConfig } from './buildClientConfig.js';
 import { config } from '../../config/index.js';
 import { logger } from '../logger/index.js';
 import { COMMERCE_KAFKA_TOPICS } from '../../constants/kafka/index.js';
