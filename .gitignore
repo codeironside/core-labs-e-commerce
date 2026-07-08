@@ -1,5 +1,5 @@
-node_modules
-dist
+node_modules/
+dist/
 .env
 .env.local
 .env.development.local
@@ -8,3 +8,7 @@ dist
 .env.development
 .env.test
 .env.production
+logs/*
+logs/**
+logs/
+.env.staging

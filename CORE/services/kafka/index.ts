@@ -1,6 +1,6 @@
 import { Kafka, type Producer, type ProducerRecord } from 'kafkajs';
 import { Partitioners } from 'kafkajs';
-import { buildKafkaClientConfig } from '../../../../KAFKA/buildClientConfig.js';
+import { buildKafkaClientConfig } from './buildClientConfig.js';
 import { config } from '../../config/index.js';
 import { logger } from '../../logger/index.js';
 import type { KafkaTopic } from '../../constants/kafka/index.js';
