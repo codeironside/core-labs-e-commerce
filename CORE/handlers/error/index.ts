@@ -1,10 +1,25 @@
 import type { Context } from 'hono';
 import type { HTTPResponseError } from 'hono/types';
-import { AppError } from '@core-labs/platform-core';
 import { logger } from '../../services/logger/index.js';
 import { config } from '../../config/index.js';
 
-export { AppError };
+export class AppError extends Error {
+  readonly statusCode: number;
+  readonly code?: string;
+
+  constructor(messageOrStatus: string | number, statusOrMessage?: string | number, code?: string) {
+    if (typeof messageOrStatus === 'number') {
+      super(String(statusOrMessage ?? 'Error'));
+      this.statusCode = messageOrStatus;
+      this.code = code;
+    } else {
+      super(messageOrStatus);
+      this.statusCode = typeof statusOrMessage === 'number' ? statusOrMessage : 500;
+      this.code = code;
+    }
+    this.name = 'AppError';
+  }
+}
 
 const isValidHttpStatusCode = (status: unknown): status is number =>
   typeof status === 'number' && Number.isInteger(status) && status >= 200 && status <= 599;
