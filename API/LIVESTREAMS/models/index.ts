@@ -35,6 +35,7 @@ export interface ILivestreamSession {
     recordingPublic: boolean;
     adminRecordingOverride?: 'force_hidden' | 'deleted';
     highlights: ILivestreamHighlight[];
+    likeCount: number;
     endedAt?: Date;
     metadata: Record<string, unknown>;
     createdAt: Date;
@@ -81,6 +82,14 @@ export interface ILivestreamCommentDocument extends Document {
     updatedAt: Date;
 }
 
+export interface ILivestreamLikeDocument extends Document {
+    livestreamId: mongoose.Types.ObjectId;
+    viewerKey: string;
+    isGuest: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 
 
 const livestreamSessionSchema = new mongoose.Schema<ILivestreamSessionDocument>(
@@ -106,6 +115,7 @@ const livestreamSessionSchema = new mongoose.Schema<ILivestreamSessionDocument>(
         recordingUrl: { type: String, trim: true },
         recordingPublic: { type: Boolean, default: false },
         adminRecordingOverride: { type: String, enum: ['force_hidden', 'deleted'] },
+        likeCount: { type: Number, default: 0, min: 0 },
         highlights: {
             type: [
                 new mongoose.Schema<ILivestreamHighlight>(
@@ -189,6 +199,17 @@ const livestreamCommentSchema = new mongoose.Schema<ILivestreamCommentDocument>(
 
 livestreamCommentSchema.index({ livestreamId: 1, createdAt: -1 });
 
+const livestreamLikeSchema = new mongoose.Schema<ILivestreamLikeDocument>(
+    {
+        livestreamId: { type: mongoose.Schema.Types.ObjectId, ref: 'LivestreamSession', required: true, index: true },
+        viewerKey: { type: String, required: true, index: true },
+        isGuest: { type: Boolean, default: false },
+    },
+    { timestamps: true },
+);
+
+livestreamLikeSchema.index({ livestreamId: 1, createdAt: -1 });
+
 export const LivestreamParticipant: Model<ILivestreamParticipantDocument> =
     mongoose.models.LivestreamParticipant ??
     mongoose.model<ILivestreamParticipantDocument>('LivestreamParticipant', livestreamParticipantSchema);
@@ -204,3 +225,7 @@ export const LivestreamBid: Model<ILivestreamBidDocument> =
 export const LivestreamComment: Model<ILivestreamCommentDocument> =
     mongoose.models.LivestreamComment ??
     mongoose.model<ILivestreamCommentDocument>('LivestreamComment', livestreamCommentSchema);
+
+export const LivestreamLike: Model<ILivestreamLikeDocument> =
+    mongoose.models.LivestreamLike ??
+    mongoose.model<ILivestreamLikeDocument>('LivestreamLike', livestreamLikeSchema);

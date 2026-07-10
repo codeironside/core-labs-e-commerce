@@ -26,7 +26,7 @@ export const fetchLivestreamAnalyticsController = async (context: Context) => {
     await assertLivestreamAccessibleInScope(userId, livestreamId);
 
     const livestream = await LivestreamSession.findById(livestreamId)
-      .select('_id title status endedAt createdAt recordingUrl metadata')
+      .select('_id title status endedAt createdAt recordingUrl metadata likeCount highlights')
       .lean();
     if (!livestream) throw new AppError(SYSTEM_MESSAGES.ERRORS.LIVESTREAM_NOT_FOUND, 404);
 
@@ -76,6 +76,7 @@ export const fetchLivestreamAnalyticsController = async (context: Context) => {
         peakViewers,
         totalBids,
         totalComments,
+        totalLikes: livestream.likeCount ?? 0,
         totalAuctions,
         closedAuctions,
         totalSales,

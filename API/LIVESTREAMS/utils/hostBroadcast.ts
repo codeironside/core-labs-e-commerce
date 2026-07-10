@@ -8,6 +8,7 @@ type LivestreamHostSource = {
   agoraHostUid?: number;
   hostToken: string;
   hostTokenExpiresAt?: number;
+  streamProvider?: 'agora' | 'cloudflare' | string;
 };
 
 export type ResolvedHostBroadcast = {
@@ -19,6 +20,17 @@ export type ResolvedHostBroadcast = {
 export const resolveHostBroadcastCredentials = async (
   livestream: LivestreamHostSource,
 ): Promise<ResolvedHostBroadcast> => {
+  const provider = livestream.streamProvider ?? 'agora';
+
+  // Cloudflare hosts use stream keys, not Agora UIDs — never refresh via Agora/CF create.
+  if (provider === 'cloudflare') {
+    return {
+      hostUid: resolveVendorBroadcastUid(livestream.agoraHostUid),
+      hostToken: livestream.hostToken,
+      expiresAt: livestream.hostTokenExpiresAt,
+    };
+  }
+
   const hostUid = resolveVendorBroadcastUid(livestream.agoraHostUid);
   const needsRefresh = livestream.agoraHostUid !== hostUid;
 
@@ -35,6 +47,7 @@ export const resolveHostBroadcastCredentials = async (
   const refreshed = await LivestreamProviderService.createPublisherSession({
     channelName: livestream.agoraChannelName,
     expireSeconds,
+    provider: 'agora',
   });
 
   const livestreamId = String(livestream._id);

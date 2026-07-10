@@ -21,6 +21,7 @@ import { User } from '../../../AUTH/models/index.js';
 import { assertUserCanJoinStream } from '../../../../CORE/services/livestreamConcurrency/index.js';
 
 import { buildViewerStreamPayload, resolveGuestViewerKey } from '../../utils/viewerStream.js';
+import { touchViewerPresence } from '../../utils/viewerPresence.js';
 import { resolveCoverImageUrl } from '../../utils/coverImage.js';
 import { resolveLivestreamHostUser } from '../../../STORES/utils/storeAccess.js';
 import { resolveHostBroadcastCredentials } from '../../utils/hostBroadcast.js';
@@ -67,7 +68,7 @@ export const joinLivestreamController = async (context: Context) => {
 
       .select(
 
-        '_id agoraChannelName agoraAppId hostToken hostTokenExpiresAt title description recordingEnabled listedProductIds bannedUserIds vendorId hostUserId status endedAt agoraHostUid streamProvider playbackUrl metadata createdAt',
+        '_id agoraChannelName agoraAppId hostToken hostTokenExpiresAt title description recordingEnabled listedProductIds bannedUserIds vendorId hostUserId status endedAt agoraHostUid streamProvider playbackUrl ingestUrl metadata createdAt likeCount',
 
       )
 
@@ -174,6 +175,7 @@ export const joinLivestreamController = async (context: Context) => {
             role: 'host' as const,
             expiresAt: hostBroadcast.expiresAt ?? livestream.hostTokenExpiresAt,
             playbackUrl: livestream.playbackUrl,
+            ingestUrl: livestream.ingestUrl,
           };
         })()
       : await buildViewerStreamPayload(livestream, userId);
@@ -198,7 +200,7 @@ export const joinLivestreamController = async (context: Context) => {
 
 
 
-    const viewerCount = await LivestreamParticipant.countDocuments({ livestreamId });
+    const viewerCount = await touchViewerPresence(livestreamId, userId);
 
     if (viewerCount > 0) {
       const currentPeak =
@@ -242,6 +244,8 @@ export const joinLivestreamController = async (context: Context) => {
 
           coverImageUrl: resolveCoverImageUrl(livestream.metadata),
 
+          likeCount: livestream.likeCount ?? 0,
+
         },
 
         products,
@@ -249,6 +253,8 @@ export const joinLivestreamController = async (context: Context) => {
         stream: streamPayload,
 
         viewerCount,
+
+        likeCount: livestream.likeCount ?? 0,
 
         isHost,
 

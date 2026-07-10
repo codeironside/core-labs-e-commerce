@@ -28,6 +28,7 @@ import {
   captureHighlightMomentController,
 } from '../services/clip.highlight/index.js';
 import { watchLivestreamController } from '../services/watch.livestream/index.js';
+import { likeLivestreamController } from '../services/like.livestream/index.js';
 import { issueShareCameraTokenController } from '../services/issue.share.camera.token/index.js';
 import { createLivestreamOrderController } from '../services/create.live.order/index.js';
 import { fetchAuctionWinnersController } from '../services/fetch.auction.winners/index.js';
@@ -347,6 +348,7 @@ const fetchActiveLivestreamsRoute = createRoute({
 
 livestreamsRouter.get('/active', fetchActiveLivestreamsController as any);
 livestreamsRouter.get('/:livestreamId/watch', watchLivestreamController as any);
+livestreamsRouter.post('/:livestreamId/likes', likeLivestreamController as any);
 livestreamsRouter.post('/:livestreamId/share-camera/token', issueShareCameraTokenController as any);
 livestreamsRouter.use('/:livestreamId/orders', requireRole([ROLE_NAMES.USER, ROLE_NAMES.VENDOR, ROLE_NAMES.ADMIN, ROLE_NAMES.ADMIN_L1]));
 livestreamsRouter.post('/:livestreamId/orders', createLivestreamOrderController as any);

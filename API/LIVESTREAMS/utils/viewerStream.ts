@@ -1,7 +1,7 @@
-import { randomUUID } from 'node:crypto';
-import type { Context } from 'hono';
 import { resolveVendorBroadcastUid } from '../../../CORE/services/livestreams/index.js';
 import { LivestreamProviderService } from '../../../CORE/services/livestreams/provider/index.js';
+import { randomUUID } from 'node:crypto';
+import type { Context } from 'hono';
 
 type LivestreamStreamSource = {
   agoraChannelName: string;
@@ -27,36 +27,20 @@ export const buildViewerStreamPayload = async (
 ) => {
   const remaining = (livestream.hostTokenExpiresAt ?? 0) - Math.floor(Date.now() / 1000);
   const expireSeconds = Math.max(remaining, 3600);
-
-  const provider = livestream.streamProvider ?? 'agora';
-
-  if (provider === 'cloudflare') {
-    const viewerSession = await LivestreamProviderService.createViewerSession({
-      channelName: livestream.agoraChannelName,
-      externalUserId,
-      expireSeconds,
-    });
-    return {
-      provider: viewerSession.provider,
-      appId: viewerSession.appId,
-      channelName: viewerSession.channelName,
-      token: viewerSession.hostToken,
-      uid: viewerSession.uid,
-      hostUid: resolveVendorBroadcastUid(livestream.agoraHostUid),
-      role: 'audience' as const,
-      expiresAt: viewerSession.expiresAt,
-      playbackUrl: viewerSession.playbackUrl ?? livestream.playbackUrl,
-    };
-  }
+  const provider = (livestream.streamProvider === 'cloudflare' ? 'cloudflare' : 'agora') as
+    | 'agora'
+    | 'cloudflare';
 
   const viewerSession = await LivestreamProviderService.createViewerSession({
     channelName: livestream.agoraChannelName,
     externalUserId,
     expireSeconds,
+    provider,
+    playbackUrl: livestream.playbackUrl,
   });
 
   return {
-    provider: viewerSession.provider,
+    provider,
     appId: viewerSession.appId ?? livestream.agoraAppId,
     channelName: viewerSession.channelName,
     token: viewerSession.hostToken,
@@ -64,6 +48,6 @@ export const buildViewerStreamPayload = async (
     hostUid: resolveVendorBroadcastUid(livestream.agoraHostUid),
     role: 'audience' as const,
     expiresAt: viewerSession.expiresAt,
-    playbackUrl: viewerSession.playbackUrl ?? livestream.playbackUrl,
+    playbackUrl: livestream.playbackUrl ?? viewerSession.playbackUrl ?? null,
   };
 };

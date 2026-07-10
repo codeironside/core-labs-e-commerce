@@ -67,7 +67,14 @@ export type LivestreamRealtimeEvent =
     }
   | { type: 'livestream.status'; livestreamId: string; channelName: string; status: string; updatedAt: string }
   | { type: 'livestream.ended'; livestreamId: string; endedAt: string; status?: 'ended' | 'cancelled' }
-  | { type: 'viewer.count'; livestreamId: string; viewerCount: number };
+  | { type: 'viewer.count'; livestreamId: string; viewerCount: number }
+  | {
+      type: 'like.created';
+      livestreamId: string;
+      likeCount: number;
+      viewerKey: string;
+      createdAt: string;
+    };
 
 const channelForLivestream = (livestreamId: string): string => `livestream:${livestreamId}:events`;
 

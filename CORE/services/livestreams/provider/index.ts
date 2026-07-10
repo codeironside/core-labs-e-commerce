@@ -19,8 +19,9 @@ export const LivestreamProviderService = {
   async createPublisherSession(input: {
     channelName: string;
     expireSeconds?: number;
+    provider?: 'agora' | 'cloudflare';
   }): Promise<LivestreamPublisherCredentials> {
-    const provider = await getLivestreamProviderSetting();
+    const provider = input.provider ?? (await getLivestreamProviderSetting());
 
     if (provider === 'cloudflare') {
       try {
@@ -63,15 +64,18 @@ export const LivestreamProviderService = {
     channelName: string;
     externalUserId: string;
     expireSeconds?: number;
+    provider?: 'agora' | 'cloudflare';
+    playbackUrl?: string | null;
   }): Promise<LivestreamPublisherCredentials> {
-    const provider = await getLivestreamProviderSetting();
+    const provider = input.provider ?? (await getLivestreamProviderSetting());
 
     if (provider === 'cloudflare') {
       return {
         provider: 'cloudflare',
         channelName: input.channelName,
         hostToken: '',
-        playbackUrl: `https://watch.cloudflarestream.com/${input.channelName}`,
+        // Always prefer the real HLS URL stored on the session at create time.
+        playbackUrl: input.playbackUrl ?? undefined,
       };
     }
 
@@ -97,8 +101,9 @@ export const LivestreamProviderService = {
     channelName: string;
     externalUserId: string;
     expireSeconds?: number;
+    provider?: 'agora' | 'cloudflare';
   }): Promise<LivestreamPublisherCredentials> {
-    const provider = await getLivestreamProviderSetting();
+    const provider = input.provider ?? (await getLivestreamProviderSetting());
 
     if (provider === 'cloudflare') {
       throw new Error('Share camera is not supported for Cloudflare streams.');

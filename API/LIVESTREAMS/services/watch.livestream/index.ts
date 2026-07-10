@@ -8,6 +8,7 @@ import { LivestreamParticipant, LivestreamSession } from '../../models/index.js'
 import { Product } from '../../../PRODUCTS/models/index.js';
 import { User } from '../../../AUTH/models/index.js';
 import { buildViewerStreamPayload, resolveGuestViewerKey } from '../../utils/viewerStream.js';
+import { touchViewerPresence } from '../../utils/viewerPresence.js';
 import { resolveCoverImageUrl } from '../../utils/coverImage.js';
 import { resolveLivestreamHostUser } from '../../../STORES/utils/storeAccess.js';
 
@@ -20,7 +21,7 @@ export const watchLivestreamController = async (context: Context) => {
 
     const livestream = await LivestreamSession.findById(livestreamId)
       .select(
-        '_id title description vendorId hostUserId status endedAt listedProductIds playbackUrl agoraAppId agoraChannelName hostTokenExpiresAt agoraHostUid streamProvider recordingEnabled createdAt metadata',
+        '_id title description vendorId hostUserId status endedAt listedProductIds playbackUrl agoraAppId agoraChannelName hostTokenExpiresAt agoraHostUid streamProvider recordingEnabled createdAt metadata likeCount',
       )
       .lean();
 
@@ -59,7 +60,22 @@ export const watchLivestreamController = async (context: Context) => {
       );
     }
 
-    const viewerCount = await LivestreamParticipant.countDocuments({ livestreamId });
+    let viewerCount = 0;
+    if (!ended) {
+      viewerCount = await touchViewerPresence(livestreamId, viewerKey);
+      const currentPeak =
+        typeof livestream.metadata?.peakViewerCount === 'number'
+          ? livestream.metadata.peakViewerCount
+          : 0;
+      if (viewerCount > currentPeak) {
+        await LivestreamSession.updateOne(
+          { _id: livestreamId },
+          { $set: { 'metadata.peakViewerCount': viewerCount } },
+        );
+      }
+    } else {
+      viewerCount = await LivestreamParticipant.countDocuments({ livestreamId });
+    }
 
     const streamPayload = ended
       ? {
@@ -68,7 +84,10 @@ export const watchLivestreamController = async (context: Context) => {
         }
       : await buildViewerStreamPayload(livestream, viewerKey);
 
-    logger.info({ livestreamId, isAuthenticated, viewerCount }, 'Public livestream watch');
+    logger.info(
+      { livestreamId, isAuthenticated, viewerCount, provider: streamPayload.provider },
+      'Public livestream watch',
+    );
 
     return ResponseHandler.success(context, 'Livestream session loaded.', {
       isHost,
@@ -84,10 +103,12 @@ export const watchLivestreamController = async (context: Context) => {
         recordingEnabled: livestream.recordingEnabled,
         createdAt: livestream.createdAt,
         coverImageUrl: resolveCoverImageUrl(livestream.metadata),
+        likeCount: livestream.likeCount ?? 0,
       },
       products,
       stream: streamPayload,
       viewerCount,
+      likeCount: livestream.likeCount ?? 0,
       guestViewerId: isAuthenticated ? undefined : viewerKey.replace(/^guest_/, ''),
       permissions: {
         canComment: isAuthenticated,

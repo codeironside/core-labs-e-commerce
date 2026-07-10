@@ -15,6 +15,7 @@ const SOCKET_EVENT_BY_TYPE: Partial<Record<LivestreamRealtimeEvent['type'], stri
   'livestream.ended': 'livestream:ended',
   'livestream.products-updated': 'livestream:products-updated',
   'viewer.count': 'livestream:viewer-count',
+  'like.created': 'livestream:like',
 };
 
 let socketEmitFn: SocketEmitFn | null = null;
