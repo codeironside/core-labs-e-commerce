@@ -2,19 +2,25 @@
  * Ensures platform livestream provider is set to Agora (uses local .env.development Agora keys).
  * Run: npm run setup:livestream
  */
-import mongoose from 'mongoose';
+import mongoose, { type Model } from 'mongoose';
 import { config as loadEnv } from 'dotenv';
 
 loadEnv({ path: `.env.${process.env.NODE_ENV ?? 'development'}` });
 loadEnv();
 
-const uri = process.env.MONGODB_URI;
-if (!uri) {
+const rawUri = process.env.MONGODB_URI;
+if (!rawUri) {
   console.error('MONGODB_URI is missing.');
   process.exit(1);
 }
+const mongoUri = rawUri;
 
-const schema = new mongoose.Schema(
+type PlatformSettingsDoc = {
+  singletonKey?: string;
+  livestreamProvider?: 'agora' | 'cloudflare';
+};
+
+const schema = new mongoose.Schema<PlatformSettingsDoc>(
   {
     singletonKey: { type: String, enum: ['platform'], default: 'platform', unique: true },
     livestreamProvider: { type: String, enum: ['agora', 'cloudflare'], default: 'agora' },
@@ -22,11 +28,12 @@ const schema = new mongoose.Schema(
   { collection: 'platformsettings' },
 );
 
-const PlatformSettings =
-  mongoose.models.PlatformSettings ?? mongoose.model('PlatformSettings', schema);
+const PlatformSettings: Model<PlatformSettingsDoc> =
+  (mongoose.models.PlatformSettings as Model<PlatformSettingsDoc> | undefined)
+  ?? mongoose.model<PlatformSettingsDoc>('PlatformSettings', schema);
 
-async function main() {
-  await mongoose.connect(uri);
+async function main(): Promise<void> {
+  await mongoose.connect(mongoUri);
   const result = await PlatformSettings.findOneAndUpdate(
     { singletonKey: 'platform' },
     { $set: { livestreamProvider: 'agora' } },
@@ -39,7 +46,7 @@ async function main() {
   await mongoose.disconnect();
 }
 
-void main().catch((error) => {
+void main().catch((error: unknown) => {
   console.error(error);
   process.exit(1);
 });

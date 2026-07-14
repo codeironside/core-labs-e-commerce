@@ -4,13 +4,13 @@ export type VendorStoreStatus = 'active' | 'archived';
 export type StoreManagerRole = 'manager' | 'streamer';
 
 export type StoreAddress = {
-  formattedAddress?: string;
-  line1?: string;
-  line2?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  postalCode?: string;
+  formattedAddress?: string | undefined;
+  line1?: string | undefined;
+  line2?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  country?: string | undefined;
+  postalCode?: string | undefined;
 };
 
 export type StoreLocation = {
@@ -22,12 +22,12 @@ export interface IVendorStore {
   vendorId: mongoose.Types.ObjectId;
   name: string;
   slug: string;
-  description?: string;
-  logoUrl?: string;
-  coverImageUrl?: string;
-  address?: StoreAddress;
-  location?: StoreLocation;
-  googlePlaceId?: string;
+  description?: string | undefined;
+  logoUrl?: string | undefined;
+  coverImageUrl?: string | undefined;
+  address?: StoreAddress | undefined;
+  location?: StoreLocation | undefined;
+  googlePlaceId?: string | undefined;
   status: VendorStoreStatus;
   isDefault: boolean;
   createdAt: Date;

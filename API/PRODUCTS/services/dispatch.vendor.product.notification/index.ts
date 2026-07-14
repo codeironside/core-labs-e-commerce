@@ -19,7 +19,7 @@ async function notifyUser(input: {
   title: string;
   body: string;
   accent: 'success' | 'info';
-  email?: string;
+  email?: string | undefined;
   metadata: Record<string, string>;
 }): Promise<void> {
   await publishNotificationDispatch({
@@ -63,7 +63,7 @@ export const dispatchVendorProductNotification = async (
     title,
     body,
     accent: isPublished ? 'success' : 'info',
-    email: vendorEmail,
+    ...(vendorEmail !== undefined ? { email: vendorEmail } : {}),
     metadata,
   });
 
@@ -88,18 +88,19 @@ export const dispatchVendorProductNotification = async (
       );
 
       await Promise.all(
-        managerIds.map((managerId) =>
-          notifyUser({
+        managerIds.map((managerId) => {
+          const managerEmail = managerEmailMap.get(managerId);
+          return notifyUser({
             userId: managerId,
             title: isPublished ? 'New product on your store' : 'Draft product added',
             body: isPublished
               ? `"${input.productName}" was published to a storefront you manage.`
               : `"${input.productName}" was saved as a draft on a storefront you manage.`,
             accent: isPublished ? 'success' : 'info',
-            email: managerEmailMap.get(managerId),
+            ...(managerEmail !== undefined ? { email: managerEmail } : {}),
             metadata: { ...metadata, eventType: 'store_manager_product_created' },
-          }),
-        ),
+          });
+        }),
       );
     }
   }

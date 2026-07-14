@@ -86,6 +86,7 @@ export const createLivestreamBuyNowOrder = async ({
   }
 
   await assertProductHasStock(productId, quantity);
+  const unitPrice = product.pricing?.amount ?? 0;
   if (unitPrice <= 0) {
     throw new AppError('Product does not have a valid list price.', 400);
   }

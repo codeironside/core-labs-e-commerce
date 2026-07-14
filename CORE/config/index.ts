@@ -5,6 +5,7 @@ loadEnv({ path: `.env.${process.env.NODE_ENV ?? 'development'}` });
 loadEnv();
 
 const envSchema = z.object({
+  SERVICE_NAME: z.string().default('e-commerce'),
   NODE_ENV: z.enum(['development', 'staging', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(4001),
   API_VERSION: z.string().default('v1'),
@@ -49,6 +50,8 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((s) => (s?.trim() ? s.trim() : undefined)),
+  SERVICE_VERSION: z.string().default('0.0.0'),
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error', 'silent']).default('info'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -59,6 +62,7 @@ if (!parsed.success) {
 const env = parsed.data;
 
 export const config = {
+ 
   app: {
     port: env.PORT,
     NODE_ENV: env.NODE_ENV,
@@ -67,6 +71,10 @@ export const config = {
     API_VERSION: env.API_VERSION,
     JWT_ACCESS_SECRET: env.JWT_ACCESS_SECRET,
     financeUrl: env.FINANCE_URL,
+    /** Observability identity — required by CORE logger. */
+    serviceName: env.SERVICE_NAME,
+    serviceVersion: env.SERVICE_VERSION,
+    logLevel: env.LOG_LEVEL,
   },
   db: {
     uri: env.MONGODB_URI,

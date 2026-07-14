@@ -6,6 +6,7 @@ import { AppError } from '../../../../CORE/handlers/error/index.js';
 import { SYSTEM_MESSAGES } from '../../../../CORE/utils/constants/index.js';
 import { VendorStore } from '../../../STORES/models/index.js';
 import { User } from '../../../AUTH/models/index.js';
+import { Product } from '../../../PRODUCTS/models/index.js';
 import { LiveAlertSubscription } from '../../models/index.js';
 import {
   fetchLiveAlertStatusQuerySchema,
@@ -14,7 +15,7 @@ import {
 } from '../../schemas/index.js';
 
 const assertLiveAlertTargetExists = async (
-  targetType: 'store' | 'vendor',
+  targetType: 'store' | 'vendor' | 'product',
   targetId: string,
 ): Promise<void> => {
   if (targetType === 'store') {
@@ -23,6 +24,14 @@ const assertLiveAlertTargetExists = async (
       .lean();
     if (!store) {
       throw new AppError('Store not found.', 404);
+    }
+    return;
+  }
+
+  if (targetType === 'product') {
+    const product = await Product.findById(targetId).select('_id').lean();
+    if (!product) {
+      throw new AppError('Product not found.', 404);
     }
     return;
   }

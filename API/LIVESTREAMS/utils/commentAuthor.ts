@@ -14,9 +14,10 @@ export const resolveCommentAuthor = async (userId: string): Promise<CommentAutho
   }
 
   const user = await User.findById(userId).select('name profileImage').lean();
+  const userWithProfile = user as unknown as { profileImage?: string } | null;
   const profileImage =
-    user && typeof (user as { profileImage?: unknown }).profileImage === 'string'
-      ? (user as { profileImage: string }).profileImage
+    userWithProfile && typeof userWithProfile.profileImage === 'string'
+      ? userWithProfile.profileImage
       : undefined;
 
   return {

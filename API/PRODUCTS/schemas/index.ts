@@ -102,6 +102,12 @@ export const updateProductPayloadSchema = createProductPayloadBaseSchema
         primaryMediaAssetId: productMediaAssetIdSchema.optional(),
         removeMediaPublicIds: z.array(z.string().min(1)).optional().default([]),
         primaryMediaPublicId: z.string().min(1).optional(),
+        auctionSettings: z
+            .object({
+                startingBid: z.number().nonnegative().optional(),
+                minimumIncrement: z.number().positive().optional(),
+            })
+            .optional(),
     })
     .refine(
         (value) =>
@@ -118,6 +124,7 @@ export const updateProductPayloadSchema = createProductPayloadBaseSchema
             value.inventory !== undefined ||
             value.dimensions !== undefined ||
             value.status !== undefined ||
+            value.auctionSettings !== undefined ||
             (value.appendMediaAssetIds?.length ?? 0) > 0 ||
             (value.removeMediaPublicIds?.length ?? 0) > 0 ||
             value.primaryMediaAssetId !== undefined ||

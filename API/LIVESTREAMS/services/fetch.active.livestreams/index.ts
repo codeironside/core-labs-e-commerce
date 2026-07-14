@@ -51,15 +51,15 @@ export const fetchActiveLivestreamsController = async (c: Context) => {
         const enriched = sessions.map(s => {
             const vendor = vendorMap.get(String(s.vendorId));
             const listedProducts = (s.listedProductIds ?? [])
-                .map(pid => productMap.get(String(pid)))
-                .filter(Boolean);
+                .map((pid) => productMap.get(String(pid)))
+                .filter((product): product is NonNullable<typeof product> => Boolean(product));
 
             const coverImageUrl = resolveCoverImageUrl(s.metadata);
             const primaryImage = coverImageUrl
                 ?? listedProducts
-                .flatMap((p: { media?: Array<{ isPrimary?: boolean; thumbnailUrl?: string }> }) => p.media ?? [])
+                .flatMap((p) => p.media ?? [])
                 .find((m) => m.isPrimary)?.thumbnailUrl
-                ?? listedProducts.flatMap((p: { media?: Array<{ thumbnailUrl?: string }> }) => p.media ?? [])[0]?.thumbnailUrl
+                ?? listedProducts.flatMap((p) => p.media ?? [])[0]?.thumbnailUrl
                 ?? null;
 
             return {

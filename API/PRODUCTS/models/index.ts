@@ -16,7 +16,7 @@ export interface IProductCharacteristic {
 export interface IProductPricing {
     currency: string;
     amount: number;
-    compareAtAmount?: number;
+    compareAtAmount?: number | undefined;
     cost: number;
     taxInclusive: boolean;
 }

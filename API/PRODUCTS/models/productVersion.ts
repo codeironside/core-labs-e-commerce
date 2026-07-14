@@ -4,9 +4,9 @@ import type { IProductCharacteristic, IProductMedia, IProductPricing } from './i
 export interface IProductVersionSnapshot {
   name: string;
   description: string;
-  shortDescription?: string;
+  shortDescription?: string | undefined;
   category: string;
-  subcategory?: string;
+  subcategory?: string | undefined;
   pricing: IProductPricing;
   characteristics: IProductCharacteristic[];
   media: IProductMedia[];

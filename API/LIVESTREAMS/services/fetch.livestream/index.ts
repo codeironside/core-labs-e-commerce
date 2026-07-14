@@ -14,7 +14,7 @@ export const fetchLivestreamController = async (c: Context) => {
         const vendorId = String(sessionUser.id ?? sessionUser._id);
         const vendor = await User.findById(vendorId).select('role userType').lean();
 
-        if (!vendor || vendor.role !== ROLE_NAMES.VENDOR || vendor.userType !== ROLE_NAMES.VENDOR) {
+        if (!vendor || vendor.userType !== ROLE_NAMES.VENDOR) {
             throw new AppError(SYSTEM_MESSAGES.ERRORS.FORBIDDEN, 403);
         }
 

@@ -115,9 +115,24 @@ export const updateProductController = async (c: Context) => {
         const nextSnapshotSource = {
             name: (updateData.name as string | undefined) ?? existingProduct.name,
             description: (updateData.description as string | undefined) ?? existingProduct.description,
-            shortDescription: (updateData.shortDescription as string | undefined) ?? existingProduct.shortDescription,
+            ...(
+                ((updateData.shortDescription as string | undefined) ?? existingProduct.shortDescription) !== undefined
+                    ? {
+                        shortDescription:
+                            (updateData.shortDescription as string | undefined) ??
+                            existingProduct.shortDescription,
+                    }
+                    : {}
+            ),
             category: (updateData.category as string | undefined) ?? existingProduct.category,
-            subcategory: (updateData.subcategory as string | undefined) ?? existingProduct.subcategory,
+            ...(
+                ((updateData.subcategory as string | undefined) ?? existingProduct.subcategory) !== undefined
+                    ? {
+                        subcategory:
+                            (updateData.subcategory as string | undefined) ?? existingProduct.subcategory,
+                    }
+                    : {}
+            ),
             pricing: (updateData.pricing as typeof existingProduct.pricing | undefined) ?? existingProduct.pricing,
             characteristics:
                 (updateData.characteristics as typeof existingProduct.characteristics | undefined) ??

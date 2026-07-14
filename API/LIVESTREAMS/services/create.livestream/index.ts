@@ -104,10 +104,10 @@ export const createLivestreamController = async (c: Context) => {
             hostTokenExpiresAt,
             agoraHostUid: hostRtc.uid ?? 0,
             streamProvider: hostRtc.provider,
-            playbackUrl: hostRtc.playbackUrl,
-            ingestUrl: hostRtc.ingestUrl,
+            ...(hostRtc.playbackUrl !== undefined ? { playbackUrl: hostRtc.playbackUrl } : {}),
+            ...(hostRtc.ingestUrl !== undefined ? { ingestUrl: hostRtc.ingestUrl } : {}),
             recordingEnabled: payload.recordingEnabled ?? true,
-            status: 'active',
+            status: 'active' as const,
             metadata: {
                 ...(hostRtc.cloudflareInputId ? { cloudflareInputId: hostRtc.cloudflareInputId } : {}),
                 streamProvider: hostRtc.provider,
@@ -123,7 +123,9 @@ export const createLivestreamController = async (c: Context) => {
                 channelName,
                 hostToken: hostRtc.hostToken,
                 hostUid: hostRtc.uid ?? 0,
-                cloudflareInputId: hostRtc.cloudflareInputId,
+                ...(hostRtc.cloudflareInputId !== undefined
+                    ? { cloudflareInputId: hostRtc.cloudflareInputId }
+                    : {}),
             }).catch((recordingError: unknown) => {
                 logger.error({ recordingError, livestreamId: session._id }, 'Cloud recording start failed');
             });
@@ -138,7 +140,7 @@ export const createLivestreamController = async (c: Context) => {
             const { dispatchLiveAlerts } = await import('../../../LIVE_ALERTS/services/dispatch.live.alerts/index.js');
             void dispatchLiveAlerts({
                 vendorId: streamVendorId,
-                storeId: streamStoreId,
+                ...(streamStoreId ? { storeId: streamStoreId } : {}),
                 livestreamId: String(session._id),
                 title: payload.title,
                 hostUserId,

@@ -16,7 +16,11 @@ export const grantPayLaterController = async (context: Context) => {
   if (!sessionUser) throw new AppError(SYSTEM_MESSAGES.ERRORS.UNAUTHORIZED, 401);
 
   const vendorId = String(sessionUser.id ?? sessionUser._id ?? sessionUser.userId);
-  const orderId = context.req.param('orderId');
+  const orderIdParam = context.req.param('orderId');
+  if (!orderIdParam) {
+    throw new AppError('Pending auction order not found.', 404);
+  }
+  const orderId = orderIdParam;
   const body = GrantPayLaterSchema.parse(await context.req.json().catch(() => ({})));
 
   const vendor = await User.findById(vendorId).select('userType').lean();
@@ -55,7 +59,11 @@ export const sendWinnerMessageController = async (context: Context) => {
   if (!sessionUser) throw new AppError(SYSTEM_MESSAGES.ERRORS.UNAUTHORIZED, 401);
 
   const vendorId = String(sessionUser.id ?? sessionUser._id ?? sessionUser.userId);
-  const orderId = context.req.param('orderId');
+  const orderIdParam = context.req.param('orderId');
+  if (!orderIdParam) {
+    throw new AppError('Auction order not found.', 404);
+  }
+  const orderId = orderIdParam;
   const body = WinnerMessageSchema.parse(await context.req.json().catch(() => ({})));
 
   const vendor = await User.findById(vendorId).select('userType').lean();
@@ -67,7 +75,7 @@ export const sendWinnerMessageController = async (context: Context) => {
     { _id: orderId, vendorId, source: 'livestream_auction' },
     { $set: { vendorWinnerMessage: body.message } },
     { new: true },
-  );
+  ).lean();
 
   if (!order) {
     throw new AppError('Auction order not found.', 404);

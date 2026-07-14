@@ -4,8 +4,8 @@ import {
   LivestreamComment,
   LivestreamParticipant,
   LivestreamSession,
-} from '../../../LIVESTREAMS/models/index.js';
-import { Order } from '../../../ORDERS/models/index.js';
+} from '../../LIVESTREAMS/models/index.js';
+import { Order } from '../../ORDERS/models/index.js';
 
 export const resolveVendorInteractorUserIds = async (
   vendorId: string,
@@ -15,13 +15,13 @@ export const resolveVendorInteractorUserIds = async (
   const livestreams = await LivestreamSession.find({ vendorId: vendorObjectId })
     .select('_id')
     .lean();
-  const livestreamIds = livestreams.map((session) => session._id);
+  const livestreamIds = livestreams.map((session: { _id: mongoose.Types.ObjectId }) => session._id);
 
   if (livestreamIds.length === 0) {
     const buyersOnly = await Order.distinct('buyerId', { vendorId: vendorObjectId });
     return buyersOnly
-      .map((buyerId) => String(buyerId))
-      .filter((userId) => userId !== excludeUserId && mongoose.isValidObjectId(userId));
+      .map((buyerId: unknown) => String(buyerId))
+      .filter((userId: string) => userId !== excludeUserId && mongoose.isValidObjectId(userId));
   }
 
   const [participants, bidders, comments, buyers] = await Promise.all([

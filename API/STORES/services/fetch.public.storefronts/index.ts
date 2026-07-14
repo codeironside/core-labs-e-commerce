@@ -16,22 +16,58 @@ const mapStorefrontProducts = (
   products: Array<{
     _id: unknown;
     name: string;
-    category?: string;
-    pricing?: { amount?: number; currency?: string; compareAtAmount?: number };
-    media?: Array<{ url?: string; thumbnailUrl?: string }>;
-    shortDescription?: string;
-    inventory?: { quantity?: number };
+    category?: string | undefined;
+    pricing?: {
+      amount?: number | undefined;
+      currency?: string | undefined;
+      compareAtAmount?: number | undefined;
+      cost?: number | undefined;
+      taxInclusive?: boolean | undefined;
+    } | undefined;
+    media?: Array<{ url?: string | undefined; thumbnailUrl?: string | undefined }> | undefined;
+    shortDescription?: string | undefined;
+    inventory?: { quantity?: number | undefined } | undefined;
   }>,
-) =>
-  serializeProducts(products).map((product) => ({
+): PublicStorefront['products'] => {
+  const withPricing = products.flatMap((product) => {
+    if (product.pricing?.amount == null || !product.pricing.currency) {
+      return [];
+    }
+    return [
+      {
+        _id: product._id,
+        name: product.name,
+        ...(product.category !== undefined ? { category: product.category } : {}),
+        pricing: {
+          currency: product.pricing.currency,
+          amount: product.pricing.amount,
+          cost: product.pricing.cost ?? 0,
+          taxInclusive: product.pricing.taxInclusive ?? false,
+          ...(product.pricing.compareAtAmount !== undefined
+            ? { compareAtAmount: product.pricing.compareAtAmount }
+            : {}),
+        },
+        ...(product.media !== undefined ? { media: product.media } : {}),
+        ...(product.shortDescription !== undefined
+          ? { shortDescription: product.shortDescription }
+          : {}),
+        ...(product.inventory !== undefined ? { inventory: product.inventory } : {}),
+      },
+    ];
+  });
+
+  return serializeProducts(withPricing).map((product) => ({
     _id: String(product._id),
-    name: product.name,
-    category: product.category,
+    name: product.name ?? '',
+    ...(product.category !== undefined ? { category: product.category } : {}),
     pricing: product.pricing,
-    media: product.media,
-    shortDescription: product.shortDescription,
-    inventory: product.inventory,
+    ...(product.media !== undefined ? { media: product.media } : {}),
+    ...(product.shortDescription !== undefined
+      ? { shortDescription: product.shortDescription }
+      : {}),
+    ...(product.inventory !== undefined ? { inventory: product.inventory } : {}),
   }));
+};
 
 export const fetchPublicStorefrontsController = async (context: Context) => {
   try {
@@ -105,14 +141,18 @@ export const fetchPublicStorefrontsController = async (context: Context) => {
       }
     });
 
-    const storefronts: PublicStorefront[] = stores.map((store) => {
+    type StorefrontWithLivestream = PublicStorefront & {
+      activeLivestream: { id: string; title: string } | null;
+    };
+
+    const storefronts: StorefrontWithLivestream[] = stores.map((store) => {
       const storeKey = String(store._id);
       const products = mapStorefrontProducts(productsByStore.get(storeKey) ?? []);
       return {
         id: storeKey,
         name: store.name,
         slug: store.slug,
-        description: store.description,
+        ...(store.description !== undefined ? { description: store.description } : {}),
         logoUrl: store.logoUrl ?? null,
         vendorId: String(store.vendorId),
         vendorName: vendorMap.get(String(store.vendorId)) ?? 'Vendor',
@@ -167,6 +207,7 @@ export const fetchPublicStorefrontsController = async (context: Context) => {
           vendorName,
           productCount: products.length,
           products: mapStorefrontProducts(products),
+          activeLivestream: null,
         });
       });
     }

@@ -7,24 +7,24 @@ export const serializeVendorStore = (store: {
   vendorId: unknown;
   name: string;
   slug: string;
-  description?: string;
-  logoUrl?: string | null;
-  coverImageUrl?: string | null;
+  description?: string | undefined;
+  logoUrl?: string | null | undefined;
+  coverImageUrl?: string | null | undefined;
   address?: {
-    formattedAddress?: string;
-    line1?: string;
-    line2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    postalCode?: string;
-  } | null;
-  location?: { lat?: number; lng?: number } | null;
-  googlePlaceId?: string | null;
-  isDefault?: boolean;
-  status?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+    formattedAddress?: string | undefined;
+    line1?: string | undefined;
+    line2?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    country?: string | undefined;
+    postalCode?: string | undefined;
+  } | null | undefined;
+  location?: { lat?: number | undefined; lng?: number | undefined } | null | undefined;
+  googlePlaceId?: string | null | undefined;
+  isDefault?: boolean | undefined;
+  status?: string | undefined;
+  createdAt?: Date | undefined;
+  updatedAt?: Date | undefined;
 }) => ({
   id: String(store._id),
   vendorId: String(store.vendorId),

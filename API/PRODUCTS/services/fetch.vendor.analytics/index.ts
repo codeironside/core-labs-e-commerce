@@ -131,7 +131,7 @@ export const fetchVendorProductAnalyticsController = async (context: Context) =>
         currentVersion: product.version,
         pricing: product.pricing,
         inventory: product.inventory,
-        auctionSettings: (product as { auctionSettings?: Record<string, unknown> }).auctionSettings ?? null,
+        auctionSettings: (product as unknown as { auctionSettings?: Record<string, unknown> }).auctionSettings ?? null,
       },
       summary: {
         soldCount,
@@ -239,7 +239,7 @@ export const fetchVendorProductsOverviewController = async (context: Context) =>
             media: product.media,
             inventory: product.inventory,
             version: product.version,
-            auctionSettings: (product as { auctionSettings?: Record<string, unknown> }).auctionSettings ?? null,
+            auctionSettings: (product as unknown as { auctionSettings?: Record<string, unknown> }).auctionSettings ?? null,
             soldCount: sales?.soldCount ?? 0,
             revenue: sales?.revenue ?? 0,
             createdAt: product.createdAt,

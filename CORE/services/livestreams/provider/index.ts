@@ -5,21 +5,21 @@ import { getLivestreamProviderSetting } from './settings.js';
 
 export type LivestreamPublisherCredentials = {
   provider: 'agora' | 'cloudflare';
-  appId?: string;
+  appId?: string | undefined;
   channelName: string;
   hostToken: string;
-  uid?: number;
-  expiresAt?: number;
-  playbackUrl?: string;
-  ingestUrl?: string;
-  cloudflareInputId?: string;
+  uid?: number | undefined;
+  expiresAt?: number | undefined;
+  playbackUrl?: string | undefined;
+  ingestUrl?: string | undefined;
+  cloudflareInputId?: string | undefined;
 };
 
 export const LivestreamProviderService = {
   async createPublisherSession(input: {
     channelName: string;
-    expireSeconds?: number;
-    provider?: 'agora' | 'cloudflare';
+    expireSeconds?: number | undefined;
+    provider?: 'agora' | 'cloudflare' | undefined;
   }): Promise<LivestreamPublisherCredentials> {
     const provider = input.provider ?? (await getLivestreamProviderSetting());
 
@@ -30,9 +30,9 @@ export const LivestreamProviderService = {
           provider: 'cloudflare',
           channelName: input.channelName,
           hostToken: cloudflare.streamKey,
-          playbackUrl: cloudflare.playbackUrl,
-          ingestUrl: cloudflare.ingestUrl,
-          cloudflareInputId: cloudflare.inputId,
+          ...(cloudflare.playbackUrl !== undefined ? { playbackUrl: cloudflare.playbackUrl } : {}),
+          ...(cloudflare.ingestUrl !== undefined ? { ingestUrl: cloudflare.ingestUrl } : {}),
+          ...(cloudflare.inputId !== undefined ? { cloudflareInputId: cloudflare.inputId } : {}),
         };
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -47,7 +47,7 @@ export const LivestreamProviderService = {
       channelName: input.channelName,
       uid: VENDOR_BROADCAST_UID,
       role: 'publisher',
-      expireSeconds: input.expireSeconds,
+      ...(input.expireSeconds !== undefined ? { expireSeconds: input.expireSeconds } : {}),
     });
 
     return {
@@ -63,9 +63,9 @@ export const LivestreamProviderService = {
   async createViewerSession(input: {
     channelName: string;
     externalUserId: string;
-    expireSeconds?: number;
-    provider?: 'agora' | 'cloudflare';
-    playbackUrl?: string | null;
+    expireSeconds?: number | undefined;
+    provider?: 'agora' | 'cloudflare' | undefined;
+    playbackUrl?: string | null | undefined;
   }): Promise<LivestreamPublisherCredentials> {
     const provider = input.provider ?? (await getLivestreamProviderSetting());
 
@@ -74,8 +74,7 @@ export const LivestreamProviderService = {
         provider: 'cloudflare',
         channelName: input.channelName,
         hostToken: '',
-        // Always prefer the real HLS URL stored on the session at create time.
-        playbackUrl: input.playbackUrl ?? undefined,
+        ...(input.playbackUrl != null ? { playbackUrl: input.playbackUrl } : {}),
       };
     }
 
@@ -84,7 +83,7 @@ export const LivestreamProviderService = {
       channelName: input.channelName,
       uid: viewerUid,
       role: 'subscriber',
-      expireSeconds: input.expireSeconds,
+      ...(input.expireSeconds !== undefined ? { expireSeconds: input.expireSeconds } : {}),
     });
 
     return {
@@ -100,8 +99,8 @@ export const LivestreamProviderService = {
   async createShareCameraSession(input: {
     channelName: string;
     externalUserId: string;
-    expireSeconds?: number;
-    provider?: 'agora' | 'cloudflare';
+    expireSeconds?: number | undefined;
+    provider?: 'agora' | 'cloudflare' | undefined;
   }): Promise<LivestreamPublisherCredentials> {
     const provider = input.provider ?? (await getLivestreamProviderSetting());
 
@@ -114,7 +113,7 @@ export const LivestreamProviderService = {
       channelName: input.channelName,
       uid: viewerUid,
       role: 'publisher',
-      expireSeconds: input.expireSeconds,
+      ...(input.expireSeconds !== undefined ? { expireSeconds: input.expireSeconds } : {}),
     });
 
     return {

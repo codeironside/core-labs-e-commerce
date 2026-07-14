@@ -4,9 +4,9 @@ import { ProductVersion, type IProductVersionSnapshot } from '../models/productV
 type ProductSnapshotSource = {
   name: string;
   description: string;
-  shortDescription?: string;
+  shortDescription?: string | undefined;
   category: string;
-  subcategory?: string;
+  subcategory?: string | undefined;
   pricing: IProductVersionSnapshot['pricing'];
   characteristics: IProductVersionSnapshot['characteristics'];
   media: IProductVersionSnapshot['media'];
@@ -17,9 +17,9 @@ const TRACKED_FIELDS = ['name', 'description', 'shortDescription', 'category', '
 export const buildProductSnapshot = (product: ProductSnapshotSource): IProductVersionSnapshot => ({
   name: product.name,
   description: product.description,
-  shortDescription: product.shortDescription,
+  ...(product.shortDescription !== undefined ? { shortDescription: product.shortDescription } : {}),
   category: product.category,
-  subcategory: product.subcategory,
+  ...(product.subcategory !== undefined ? { subcategory: product.subcategory } : {}),
   pricing: { ...product.pricing },
   characteristics: product.characteristics.map((item) => ({ ...item })),
   media: product.media.map((item) => ({ ...item })),

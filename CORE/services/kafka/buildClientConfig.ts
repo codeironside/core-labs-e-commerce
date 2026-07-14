@@ -3,9 +3,9 @@ import type { KafkaConfig } from 'kafkajs';
 export type KafkaConnectionSettings = {
   brokers: string[];
   clientId: string;
-  saslUsername?: string;
-  saslPassword?: string;
-  ssl?: boolean;
+  saslUsername?: string | undefined;
+  saslPassword?: string | undefined;
+  ssl?: boolean | undefined;
 };
 
 export const buildKafkaClientConfig = (settings: KafkaConnectionSettings): KafkaConfig => {

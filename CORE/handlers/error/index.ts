@@ -5,7 +5,7 @@ import { config } from '../../config/index.js';
 
 export class AppError extends Error {
   readonly statusCode: number;
-  readonly code?: string;
+  readonly code?: string | undefined;
 
   constructor(messageOrStatus: string | number, statusOrMessage?: string | number, code?: string) {
     if (typeof messageOrStatus === 'number') {

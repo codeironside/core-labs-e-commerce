@@ -36,7 +36,7 @@ export const buildViewerStreamPayload = async (
     externalUserId,
     expireSeconds,
     provider,
-    playbackUrl: livestream.playbackUrl,
+    ...(livestream.playbackUrl !== undefined ? { playbackUrl: livestream.playbackUrl } : {}),
   });
 
   return {

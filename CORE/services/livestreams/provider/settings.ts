@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { type Model } from 'mongoose';
 
 type PlatformSettingsDocument = {
+  singletonKey?: string;
   livestreamProvider?: 'agora' | 'cloudflare';
 };
 
-const platformSettingsSchema = new mongoose.Schema(
+const platformSettingsSchema = new mongoose.Schema<PlatformSettingsDocument>(
   {
     singletonKey: { type: String, enum: ['platform'], default: 'platform', unique: true },
     livestreamProvider: { type: String, enum: ['agora', 'cloudflare'], default: 'agora' },
@@ -12,14 +13,14 @@ const platformSettingsSchema = new mongoose.Schema(
   { collection: 'platformsettings' },
 );
 
-const PlatformSettings =
-  mongoose.models.PlatformSettings
-  ?? mongoose.model('PlatformSettings', platformSettingsSchema);
+const PlatformSettings: Model<PlatformSettingsDocument> =
+  (mongoose.models.PlatformSettings as Model<PlatformSettingsDocument> | undefined)
+  ?? mongoose.model<PlatformSettingsDocument>('PlatformSettings', platformSettingsSchema);
 
 export const getLivestreamProviderSetting = async (): Promise<'agora' | 'cloudflare'> => {
   const settings = await PlatformSettings.findOne({ singletonKey: 'platform' })
     .select('livestreamProvider')
-    .lean<PlatformSettingsDocument>();
+    .lean();
 
   return settings?.livestreamProvider ?? 'agora';
 };

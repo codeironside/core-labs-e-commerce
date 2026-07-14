@@ -38,9 +38,9 @@ export class AgoraService {
 
   static generateRtcToken(input: {
     channelName: string;
-    uid?: number;
+    uid?: number | undefined;
     role: AgoraUserRole;
-    expireSeconds?: number;
+    expireSeconds?: number | undefined;
   }): AgoraTokenResult {
     const { appId, appCertificate } = this.getCredentials();
     const agoraRole = input.role === 'publisher' ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;

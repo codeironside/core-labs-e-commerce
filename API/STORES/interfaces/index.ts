@@ -1,35 +1,42 @@
 export type PublicStorefrontProduct = {
   _id: string;
   name: string;
-  category?: string;
+  category?: string | undefined;
   pricing?: {
-    amount?: number;
-    currency?: string;
-    compareAtAmount?: number;
-  };
-  media?: Array<{ url?: string; thumbnailUrl?: string }>;
-  shortDescription?: string;
-  inventory?: { quantity?: number };
-  soldCount?: number;
+    amount?: number | undefined;
+    currency?: string | undefined;
+    compareAtAmount?: number | undefined;
+    originalPrice?: number | undefined;
+    discountedPrice?: number | undefined;
+    hasActivePromo?: boolean | undefined;
+    activePromo?: unknown;
+    activePromos?: unknown;
+    cost?: number | undefined;
+    taxInclusive?: boolean | undefined;
+  } | undefined;
+  media?: Array<{ url?: string | undefined; thumbnailUrl?: string | undefined }> | undefined;
+  shortDescription?: string | undefined;
+  inventory?: { quantity?: number | undefined } | undefined;
+  soldCount?: number | undefined;
 };
 
 export type PublicStorefront = {
   id: string;
   name: string;
   slug: string;
-  description?: string;
-  logoUrl?: string | null;
-  coverImageUrl?: string | null;
+  description?: string | undefined;
+  logoUrl?: string | null | undefined;
+  coverImageUrl?: string | null | undefined;
   address?: {
-    formattedAddress?: string;
-    line1?: string;
-    line2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    postalCode?: string;
-  } | null;
-  location?: { lat: number; lng: number } | null;
+    formattedAddress?: string | undefined;
+    line1?: string | undefined;
+    line2?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    country?: string | undefined;
+    postalCode?: string | undefined;
+  } | null | undefined;
+  location?: { lat: number; lng: number } | null | undefined;
   vendorId: string;
   vendorName: string;
   productCount: number;

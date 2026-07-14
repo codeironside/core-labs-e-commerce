@@ -25,7 +25,7 @@ export const fetchVendorHubStatsController = async (context: Context) => {
     const scope = (await resolveVendorCatalogScope(userId)) ?? { mode: 'owner' as const, vendorId: userId };
 
     const productFilter = buildScopedProductFilter(scope);
-    const activeProductFilter = { ...productFilter, status: 'active' };
+    const activeProductFilter: Record<string, unknown> = { ...productFilter, status: 'active' };
 
     const scopedProductIds =
       scope.mode === 'manager'

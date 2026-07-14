@@ -15,8 +15,16 @@ import {
 
 
 type ProductWithPricing = {
+    _id?: unknown;
+    name?: string | undefined;
+    category?: string | undefined;
+    shortDescription?: string | undefined;
+    inventory?: { quantity?: number | undefined } | undefined;
     pricing: IProductPricing;
-    media?: IProductMedia[];
+    media?: ReadonlyArray<{
+        url?: string | undefined;
+        thumbnailUrl?: string | undefined;
+    }> | undefined;
 };
 
 type CloudinaryUploadResult = {

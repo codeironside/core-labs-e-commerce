@@ -9,6 +9,9 @@ export interface IUser {
   role: UserRole;
   userType?: UserType;
   workspaceId: mongoose.Types.ObjectId;
+  platformBanned?: boolean;
+  livestreamBanned?: boolean;
+  profileImage?: string;
   vendorProfile?: {
     canGoLive?: boolean;
     identityVerificationStatus?: string;

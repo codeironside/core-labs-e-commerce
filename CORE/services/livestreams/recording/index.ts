@@ -5,10 +5,10 @@ import { startAgoraCloudRecording, stopAgoraCloudRecording } from './agoraRecord
 import { resolveCloudflareRecordingUrl } from './cloudflareRecording.js';
 
 type RecordingMetadata = {
-  agoraRecordingResourceId?: string;
-  agoraRecordingSid?: string;
-  agoraRecordingUid?: number;
-  cloudflareInputId?: string;
+  agoraRecordingResourceId?: string | undefined;
+  agoraRecordingSid?: string | undefined;
+  agoraRecordingUid?: number | undefined;
+  cloudflareInputId?: string | undefined;
 };
 
 const readMetadata = (metadata: Record<string, unknown> | undefined): RecordingMetadata => ({

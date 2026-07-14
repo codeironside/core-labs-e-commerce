@@ -67,6 +67,13 @@ export type LivestreamRealtimeEvent =
     }
   | { type: 'livestream.status'; livestreamId: string; channelName: string; status: string; updatedAt: string }
   | { type: 'livestream.ended'; livestreamId: string; endedAt: string; status?: 'ended' | 'cancelled' }
+  | { type: 'livestream.cancelled'; livestreamId: string; endedAt: string; cancelledBy: string }
+  | {
+      type: 'livestream.participant-banned';
+      livestreamId: string;
+      userId: string;
+      reason: string;
+    }
   | { type: 'viewer.count'; livestreamId: string; viewerCount: number }
   | {
       type: 'like.created';
@@ -74,6 +81,11 @@ export type LivestreamRealtimeEvent =
       likeCount: number;
       viewerKey: string;
       createdAt: string;
+    }
+  | {
+      type: 'product.updated';
+      livestreamId: string;
+      product: Record<string, unknown>;
     };
 
 const channelForLivestream = (livestreamId: string): string => `livestream:${livestreamId}:events`;

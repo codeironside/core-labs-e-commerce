@@ -19,7 +19,11 @@ export const updateListedProductsController = async (context: Context) => {
   if (!sessionUser) throw new AppError(SYSTEM_MESSAGES.ERRORS.UNAUTHORIZED, 401);
 
   const vendorId = String(sessionUser.id ?? sessionUser._id ?? sessionUser.userId);
-  const livestreamId = context.req.param('livestreamId');
+  const livestreamIdParam = context.req.param('livestreamId');
+  if (!livestreamIdParam) {
+    throw new AppError(SYSTEM_MESSAGES.ERRORS.LIVESTREAM_NOT_FOUND, 404);
+  }
+  const livestreamId = livestreamIdParam;
   const body = UpdateListedProductsSchema.parse(await context.req.json().catch(() => ({})));
 
   const vendor = await User.findById(vendorId).select('userType').lean();

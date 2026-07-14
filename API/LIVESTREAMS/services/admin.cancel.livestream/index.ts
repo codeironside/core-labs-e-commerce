@@ -21,7 +21,11 @@ export const adminCancelLivestreamController = async (context: Context) => {
     throw new AppError(SYSTEM_MESSAGES.ERRORS.FORBIDDEN, 403);
   }
 
-  const livestreamId = context.req.param('livestreamId');
+  const livestreamIdParam = context.req.param('livestreamId');
+  if (!livestreamIdParam) {
+    throw new AppError(SYSTEM_MESSAGES.ERRORS.LIVESTREAM_NOT_FOUND, 404);
+  }
+  const livestreamId = livestreamIdParam;
   const payload = AdminCancelSchema.parse(await context.req.json().catch(() => ({})));
 
   const existing = await LivestreamSession.findOne({ _id: livestreamId, status: 'active' }).lean();

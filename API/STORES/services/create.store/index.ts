@@ -49,13 +49,13 @@ export const createStoreController = async (context: Context) => {
       vendorId: new mongoose.Types.ObjectId(vendorId),
       name: parsed.data.name,
       slug,
-      description: parsed.data.description,
-      logoUrl: parsed.data.logoUrl,
-      coverImageUrl: parsed.data.coverImageUrl,
+      ...(parsed.data.description !== undefined ? { description: parsed.data.description } : {}),
+      ...(parsed.data.logoUrl !== undefined ? { logoUrl: parsed.data.logoUrl } : {}),
+      ...(parsed.data.coverImageUrl !== undefined ? { coverImageUrl: parsed.data.coverImageUrl } : {}),
       ...(parsed.data.address ? { address: parsed.data.address } : {}),
       ...(parsed.data.location ? { location: parsed.data.location } : {}),
       ...(parsed.data.googlePlaceId ? { googlePlaceId: parsed.data.googlePlaceId } : {}),
-      status: 'active',
+      status: 'active' as const,
       isDefault: existingStoreCount === 0,
     });
 

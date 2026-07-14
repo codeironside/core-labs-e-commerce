@@ -15,6 +15,8 @@ export interface ILiveAlertSubscription {
   targetId: mongoose.Types.ObjectId;
   channels: LiveAlertChannels;
   contactPhone?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ILiveAlertSubscriptionDocument extends ILiveAlertSubscription, Document {}

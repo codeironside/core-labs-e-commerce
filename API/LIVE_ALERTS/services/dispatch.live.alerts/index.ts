@@ -8,11 +8,11 @@ import { LiveAlertSubscription } from '../../models/index.js';
 
 type DispatchLiveAlertsInput = {
   vendorId: string;
-  storeId?: string;
+  storeId?: string | undefined;
   livestreamId: string;
   title: string;
   hostUserId: string;
-  listedProductIds?: string[];
+  listedProductIds?: string[] | undefined;
 };
 
 export const dispatchLiveAlerts = async (input: DispatchLiveAlertsInput): Promise<void> => {

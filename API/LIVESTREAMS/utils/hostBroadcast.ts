@@ -14,7 +14,7 @@ type LivestreamHostSource = {
 export type ResolvedHostBroadcast = {
   hostUid: number;
   hostToken: string;
-  expiresAt?: number;
+  expiresAt?: number | undefined;
 };
 
 export const resolveHostBroadcastCredentials = async (

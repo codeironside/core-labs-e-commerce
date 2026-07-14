@@ -153,9 +153,11 @@ export const createProductController = async (c: Context) => {
       snapshot: buildProductSnapshot({
         name: product.name,
         description: product.description,
-        shortDescription: product.shortDescription,
+        ...(product.shortDescription !== undefined
+          ? { shortDescription: product.shortDescription }
+          : {}),
         category: product.category,
-        subcategory: product.subcategory,
+        ...(product.subcategory !== undefined ? { subcategory: product.subcategory } : {}),
         pricing: product.pricing,
         characteristics: product.characteristics,
         media: product.media,

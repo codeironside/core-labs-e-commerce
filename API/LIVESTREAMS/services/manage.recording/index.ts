@@ -23,7 +23,11 @@ export const addLivestreamHighlightController = async (context: Context) => {
   if (!sessionUser) throw new AppError(SYSTEM_MESSAGES.ERRORS.UNAUTHORIZED, 401);
 
   const vendorId = String(sessionUser.id ?? sessionUser._id ?? sessionUser.userId);
-  const livestreamId = context.req.param('livestreamId');
+  const livestreamIdParam = context.req.param('livestreamId');
+  if (!livestreamIdParam) {
+    throw new AppError(SYSTEM_MESSAGES.ERRORS.LIVESTREAM_NOT_FOUND, 404);
+  }
+  const livestreamId = livestreamIdParam;
   const payload = HighlightSchema.parse(await context.req.json().catch(() => ({})));
 
   const vendor = await User.findById(vendorId).select('userType').lean();
@@ -61,7 +65,11 @@ export const setRecordingVisibilityController = async (context: Context) => {
   if (!sessionUser) throw new AppError(SYSTEM_MESSAGES.ERRORS.UNAUTHORIZED, 401);
 
   const vendorId = String(sessionUser.id ?? sessionUser._id ?? sessionUser.userId);
-  const livestreamId = context.req.param('livestreamId');
+  const livestreamIdParam = context.req.param('livestreamId');
+  if (!livestreamIdParam) {
+    throw new AppError(SYSTEM_MESSAGES.ERRORS.LIVESTREAM_NOT_FOUND, 404);
+  }
+  const livestreamId = livestreamIdParam;
   const payload = RecordingVisibilitySchema.parse(await context.req.json().catch(() => ({})));
 
   const livestream = await LivestreamSession.findOneAndUpdate(
@@ -90,7 +98,11 @@ export const adminManageRecordingController = async (context: Context) => {
     throw new AppError(SYSTEM_MESSAGES.ERRORS.FORBIDDEN, 403);
   }
 
-  const livestreamId = context.req.param('livestreamId');
+  const livestreamIdParam = context.req.param('livestreamId');
+  if (!livestreamIdParam) {
+    throw new AppError(SYSTEM_MESSAGES.ERRORS.LIVESTREAM_NOT_FOUND, 404);
+  }
+  const livestreamId = livestreamIdParam;
   const body = z
     .object({
       action: z.enum(['force_hidden', 'restore_public', 'delete_recording']),

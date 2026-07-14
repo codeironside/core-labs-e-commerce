@@ -54,7 +54,7 @@ export const fetchVendorDetailController = async (context: Context) => {
         .sort({ createdAt: -1 })
         .limit(50)
         .lean(),
-      LivestreamComment.find({ userId: vendorId })
+      LivestreamComment.find({ userId: String(vendorId) })
         .select('livestreamId message createdAt')
         .sort({ createdAt: -1 })
         .limit(50)
