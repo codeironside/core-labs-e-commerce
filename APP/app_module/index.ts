@@ -9,6 +9,7 @@ import { initLivestreamSocket } from '../../CORE/services/socket/index.js';
 import { setupCoreMiddlewares } from '../../CORE/handlers/core/index.js';
 import { mountAppRouter } from '../app_route/index.js';
 import { logger } from '../../CORE/services/logger/index.js';
+import { getMetrics } from '../../CORE/services/prometheus/index.js';
 
 const bootstrap = async (): Promise<void> => {
   logger.info('[SYS] Booting e-commerce service...');
@@ -31,6 +32,7 @@ const bootstrap = async (): Promise<void> => {
 
   logger.info('[CHK] Mounting API modules...');
   const app = new OpenAPIHono({ strict: false });
+  app.get('/metrics', getMetrics);
   setupCoreMiddlewares(app);
   mountAppRouter(app);
 

@@ -37,6 +37,18 @@ const envSchema = z.object({
   AWS_REGION: z.string(),
   AWS_BUCKET: z.string(),
   AWS_SIGNED_URL_TTL: z.coerce.number().default(3600),
+  GRAFANA_LOKI_HOST: z
+    .string()
+    .optional()
+    .transform((s) => (s?.trim() ? s.trim() : undefined)),
+  GRAFANA_LOKI_USER_ID: z
+    .string()
+    .optional()
+    .transform((s) => (s?.trim() ? s.trim() : undefined)),
+  GRAFANA_LOKI_API_TOKEN: z
+    .string()
+    .optional()
+    .transform((s) => (s?.trim() ? s.trim() : undefined)),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -97,5 +109,10 @@ export const config = {
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
     bucket: env.AWS_BUCKET,
     signedUrlTtl: env.AWS_SIGNED_URL_TTL,
-  }
+  },
+  grafanaLoki: {
+    host: env.GRAFANA_LOKI_HOST,
+    userId: env.GRAFANA_LOKI_USER_ID,
+    apiToken: env.GRAFANA_LOKI_API_TOKEN,
+  },
 } as const;
