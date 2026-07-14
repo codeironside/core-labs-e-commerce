@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    // 1. File Layout
+    "rootDir": ".",
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
+    // 2. Modern Node.js Execution (Fixes the .js extension error)
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler", 
+    
+    // 3. Node Types
+    "types": ["node"],
+    "esModuleInterop": true,
+    
+    // 4. Stricter Typechecking Options (Your excellent choices)
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    
+    // 5. Build optimization
+    "sourceMap": true,
+    "declaration": false
+  },
+  "include": ["APP/**/*.ts", "CORE/**/*.ts", "scripts/**/*.ts", "API/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

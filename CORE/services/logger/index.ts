@@ -98,7 +98,7 @@ if (
     );
 }
 
-export const logger: PinoLogger = pino({
+const loggerOptions: pino.LoggerOptions = {
     level,
     base: {
         service: SERVICE_NAME,
@@ -113,8 +113,13 @@ export const logger: PinoLogger = pino({
         const ctx = loggerContext.getStore();
         return ctx ? { ...ctx } : {};
     },
-    transport: targets.length ? { targets, dedupe: true } : undefined,
-});
+};
+
+if (targets.length > 0) {
+    loggerOptions.transport = { targets, dedupe: true };
+}
+
+export const logger: PinoLogger = pino(loggerOptions);
 
 export function createLogger(component: string, bindings: Record<string, unknown> = {}): PinoLogger {
     return logger.child({ component, ...bindings });
