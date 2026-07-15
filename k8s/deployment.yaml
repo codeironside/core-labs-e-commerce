@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: e-commerce
+  name: e-commerce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: e-commerce
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: e-commerce
+    spec:
+      containers:
+      - image: etre548/e-commerce:latest
+        name: e-commerce
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4004
+        envFrom:
+        - secretRef:
+            name: e-commerce-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi

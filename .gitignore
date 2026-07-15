@@ -11,3 +11,4 @@ node_modules/
 logs/
 .env.staging
 dist/
+k8s/secrets.yaml
