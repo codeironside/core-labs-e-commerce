@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: e-commerce
+  namespace: corelabs
   labels:
     app: e-commerce
-  name: e-commerce
 spec:
   replicas: 1
   selector:
