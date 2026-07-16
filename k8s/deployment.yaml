@@ -17,8 +17,8 @@ spec:
         app: e-commerce
     spec:
       containers:
-      - image: etre548/e-commerce:latest
-        name: e-commerce
+      - image: etre548/ecommerce:latest
+        name: ecommerce
         imagePullPolicy: Always
         ports:
         - containerPort: 4004

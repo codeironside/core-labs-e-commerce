@@ -1,10 +1,10 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import pino, { type Logger as PinoLogger } from 'pino';
-import { config } from '../../config';
+import { config } from '../../config/index.js';
 import {
     buildGrafanaLokiTransportTarget,
     isGrafanaLokiConfigured,
-} from './lokiTransport';
+} from './lokiTransport.js';
 
 interface LogContext {
     requestId?: string;
